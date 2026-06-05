@@ -1,0 +1,20 @@
+hola Claude, me encuentro reunido con un nuevo cliente al que tenemos que integrar. La ruta a su git es C:\GitHub\backstageproductions. Deberas crear de cero toda la estructura tanto referida a codigo como a la dinamica de trabajo que seguimos en Unlimited Systems la cual puedes encontrar repartida en el repo C:\GitHub\UNLIMITED_AI_BRAIN, empezando por C:\GitHub\UNLIMITED_AI_BRAIN\compartido.
+La empresa se compone de gete joven sin experiencia en el mundo empresarial, digital o publicitario, por ello puedes permitirte completar o imaginar aspectos que no se esten recogiendo en primera instancia en esta reunion.
+
+La web: Necesita seccion de contacto, con lo que tu consideres. Seccion de previews de sesiones para subir luego a Soundcloud. Secioon de eventos (calendario, juntadas, DJ fulanito viene, etc). Puedes permitirte mas creatividad en esta seccion, agrega los elementos que consideres. Seccion "Artistas"
+Nombre de la marca: backstage-records
+Estilo de colores: Paleta de colores de los containers TECO, sabes lo que te digo mas o menos verdad? Principalmente naranja (color principal), pero queremos jugar con la paleta de colores asi que currate un buen panel de tweaks que incluya controles para jugar con eso en profundidad.
+Actividades de la empresa: Principalmente grabacion, edición y promoción de sesiones de musica electrónica (audio y video)
+Tipo de clientes: Dj que van a grabar (audio y video) y quieren que estos sean editados y publicitados en plataformas tipo youtube, soundcloud (Spotify y similares no porque son sesiones de DJs que mezclan derechos)
+URL temporal para el despliegue: Subdominio de unlimited-systems.net llamado "brecords". Hazte cargo de todo lo relacionado con el DNS, dime si necesitas que te refresque el token de Cloudflare.
+
+El producto:  Tu, DJ, vienes a mi estudio a grabar una sesion, la vamos a editar y la vamos a publicitar y promocionar de manera profesional.
+El objetivo: Atraer DJ a priori en Madrid, para producir y grabar en backstage productions. Ofrecer los servicios descritos. Ganar dinero pero sin mostrar precios en la web.
+
+Comentarios que me han hecho Sergio y Willy, los creadores de la marca: Es una empresa que va a querer actuar como nexo de union entre diferentes artistas, productoras, etc
+
+La web debe estar bien rellena de datos de ejemplo e imagenes creadas con IA ya que el objetivo es tener una buena preview bien nutrida de como puede llegar a quedar. Dejaremos aspectos como el servidor de mail y cosas similares para mas adelante. Puedes emplear tantos tokens como consideres necesario, usa tu imaginacion y como siempre tabajemos con seriedad y cariño para entregar un producto original y llamativo.
+
+Divide el trabajo en tantas sesiones como consideres y dame instrucciones del orden y paralelismo de los prompts y lo que necesites de mi.
+
+Quedo atento para lo que necesites. 
