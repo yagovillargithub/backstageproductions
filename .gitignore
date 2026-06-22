@@ -29,6 +29,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
+# capturas de validación visual (artefactos locales, ver docs/10)
+/scripts/shots/
+
 # editor
 .vscode/*
 !.vscode/extensions.json

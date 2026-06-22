@@ -27,12 +27,14 @@ El producto es un servicio: *"Tú, DJ, vienes a mi estudio a grabar una sesión;
 
 | Fase | Objetivo | Entregable | Estado |
 |---|---|---|---|
-| **S0** | Cimientos | Sistema de memoria + scaffold Next.js rebrandeado | ⏳ |
-| **S1** | Identidad | Paleta TECO + Tweaks Pro ampliado + primitivas de diseño + arte SVG | ⏭ |
-| **S2** | Secciones | Home · Artistas · Sesiones · Eventos · Contacto (markup sobre contrato CSS) | ⏭ |
-| **S3** | Contenido | `content/*.ts` nutrido + pósters SVG + `IMAGENES.md` (pack de prompts) | ⏭ |
-| **S4** | Pulido | Responsive, accesibilidad, animaciones, validación visual, `build` | ⏭ |
-| **S5** | Despliegue | systemd + vhost Apache + Let's Encrypt + DNS Cloudflare `brecords` | ⏭ (gated) |
+| **S0** | Cimientos | Sistema de memoria + scaffold Next.js rebrandeado | ✅ |
+| **S1** | Identidad | Paleta TECO + Tweaks Pro ampliado + primitivas de diseño + arte SVG | ✅ |
+| **S2** | Secciones | Home · Artistas · Sesiones · Eventos · Contacto (markup sobre contrato CSS) | ✅ |
+| **S3** | Contenido | `content/*.ts` nutrido + pósters SVG + `IMAGENES.md` (pack de prompts) | ✅ |
+| **S4** | Pulido | Responsive, accesibilidad, animaciones, validación visual, `build` | ✅ |
+| **S5** | Despliegue | systemd + vhost Apache + Let's Encrypt + DNS Cloudflare `brecords` | ✅ |
+
+> S0–S5 cerradas el 2026-06-16: la web está **en vivo** en https://brecords.unlimited-systems.net, completa y validada (tipos, build, visual y despliegue verificado). Detalle en [`HANDOVER.md`](HANDOVER.md), [`docs/04-despliegue.md`](docs/04-despliegue.md) y [`docs/changelog/2026-06-16_web-completa.md`](docs/changelog/2026-06-16_web-completa.md).
 
 ## Decisiones de producto ya tomadas (zonas grises)
 

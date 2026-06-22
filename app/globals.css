@@ -1,0 +1,1257 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────────
+   BACKSTAGE RECORDS — Design system completo (identidad industrial TECO)
+   Portado del patrón UNLIMITED_Web y rebrandeado: contenedores, acero
+   corrugado, hormigón y naranja óxido, con glow opcional de club.
+   Los atributos data-* (palette, theme, font, hero, density, radius,
+   accent-intensity, contrast, motion, grain, glow, texture) los pone el
+   provider de Tweaks en <html> y se sobreescriben en sus bloques propios,
+   de modo que cascadan por todos los componentes. El matiz del acento
+   llega como --accent-shift inline en html.style (−40deg..40deg).
+   Este fichero es la fuente de verdad del contrato de clases que consumen
+   las secciones (ver docs/03-identidad-visual-tweaks.md).
+   ───────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Paleta — default teco (industrial oscuro, naranja óxido) */
+  --bg: #14110d;
+  --bg-2: #1c1813;
+  --fg: #f2ece1;
+  --fg-dim: #c9c1b3;
+  --fg-faint: rgba(242, 236, 225, 0.55);
+  --rule: rgba(242, 236, 225, 0.14);
+  --steel: #8f8b82; /* gris metálico secundario (sustituye al --sage del patrón) */
+
+  /* Acento vivo — cada paleta define su --accent-h/s/l; el slider del panel
+     desplaza --accent-shift y TODO el naranja del sitio deriva de --accent.
+     Las variantes de intensidad redefinen --accent mezclando SIEMPRE sobre
+     --accent-core (mezclar sobre --accent crearía un ciclo de auto-referencia
+     — bug latente del repo base que no heredamos). */
+  --accent-h: 76deg;
+  --accent-s: 60%;
+  --accent-l: 50%; /* hsl(76 60% 50%) ≈ #a3cc33 — verde Backstage (brand sheet) */
+  --accent-core: hsl(calc(var(--accent-h) + var(--accent-shift, 0deg)) var(--accent-s) var(--accent-l));
+  --accent: var(--accent-core);
+  --accent-ink: #11160a; /* texto sobre superficies acento (verde → tinta oscura) */
+  --err: #d4654a;        /* rojo óxido para errores de formulario */
+
+  /* Tipos — construidos sobre las vars de next/font de app/layout.tsx */
+  --f-display: var(--font-instrument-serif), "Cormorant Garamond", Georgia, serif;
+  --f-sans: var(--font-inter-tight), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --f-mono: var(--font-jetbrains-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Escala espacial */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 16px;
+  --s-4: 24px;
+  --s-5: 40px;
+  --s-6: 64px;
+  --s-7: 96px;
+  --s-8: 144px;
+
+  --maxw: 1440px;
+  --gutter: clamp(20px, 4vw, 64px);
+
+  --easing: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur: 0.8s;
+
+  /* Knobs del panel Tweaks (defaults Backstage: sharp + glow soft +
+     textura corrugado + grano sutil) */
+  --radius-scale: 0;
+  --radius-base: 2px;                                   /* pills, chips, botones */
+  --radius-card: calc(2px + 12px * var(--radius-scale)); /* tarjetas, paneles */
+  --motion-scale: 1;
+  --grain-opacity: 0.04;
+  --glow-strength: 0.4;
+  --texture-opacity: 0.06;
+}
+
+/* Tailwind v4 — expone los tokens como theme values (`bg-bg`, `text-fg`,
+   `text-steel`, `font-display`...). Referencian las CSS vars vivas para que
+   los cambios de paleta del panel propaguen sin recompilar utilidades. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-fg: var(--fg);
+  --color-fg-dim: var(--fg-dim);
+  --color-fg-faint: var(--fg-faint);
+  --color-rule: var(--rule);
+  --color-steel: var(--steel);
+  --color-accent: var(--accent);
+
+  --font-display: var(--f-display);
+  --font-sans: var(--f-sans);
+  --font-mono: var(--f-mono);
+}
+
+/* ───────── Paletas — conmutables desde el panel Tweaks ───────── */
+/* Brecords — identidad de marca por defecto: mismo negro industrial que teco
+   pero con el verde lima del brand sheet como acento. El naranja "óxido" sigue
+   a un clic en la paleta Teco, para que el cliente compare configuraciones. */
+[data-palette="brecords"] {
+  --bg: #14110d;
+  --bg-2: #1c1813;
+  --fg: #f2ece1;
+  --fg-dim: #c9c1b3;
+  --fg-faint: rgba(242, 236, 225, 0.55);
+  --rule: rgba(242, 236, 225, 0.14);
+  --steel: #8f8b82;
+  --accent-h: 76deg;
+  --accent-s: 60%;
+  --accent-l: 50%; /* ≈ #a3cc33 — verde Backstage */
+}
+[data-palette="teco"] {
+  --bg: #14110d;
+  --bg-2: #1c1813;
+  --fg: #f2ece1;
+  --fg-dim: #c9c1b3;
+  --fg-faint: rgba(242, 236, 225, 0.55);
+  --rule: rgba(242, 236, 225, 0.14);
+  --steel: #8f8b82;
+  --accent-h: 21deg;
+  --accent-s: 80%;
+  --accent-l: 51%; /* #e8631a */
+}
+[data-palette="acero"] {
+  --bg: #ece8e1;
+  --bg-2: #e2ddd3;
+  --fg: #16130e;
+  --fg-dim: #45413a;
+  --fg-faint: rgba(22, 19, 14, 0.55);
+  --rule: rgba(22, 19, 14, 0.16);
+  --steel: #6e6a61;
+  --accent-h: 20deg;
+  --accent-s: 77%;
+  --accent-l: 44%; /* #c4521a */
+}
+[data-palette="club"] {
+  --bg: #0a0a0c;
+  --bg-2: #121216;
+  --fg: #f4f1ea;
+  --fg-dim: #b9b6ad;
+  --fg-faint: rgba(244, 241, 234, 0.55);
+  --rule: rgba(244, 241, 234, 0.13);
+  --steel: #84858d;
+  --accent-h: 21deg;
+  --accent-s: 100%;
+  --accent-l: 55%; /* #ff6a1a */
+}
+[data-palette="monolito"] {
+  --bg: #0b0b0b;
+  --bg-2: #151515;
+  --fg: #fafafa;
+  --fg-dim: #a8a8a8;
+  --fg-faint: rgba(250, 250, 250, 0.55);
+  --rule: rgba(250, 250, 250, 0.16);
+  --steel: #8c8c8c;
+  --accent-h: 23deg;
+  --accent-s: 100%;
+  --accent-l: 58%; /* #ff7a2a */
+}
+
+/* Tema claro — va DESPUÉS de las paletas para que dark:false aclare
+   cualquier paleta (misma especificidad: gana el orden). El acento de la
+   paleta elegida se conserva. Valores coherentes con acero. */
+[data-theme="light"] {
+  --bg: #ece8e1;
+  --bg-2: #e2ddd3;
+  --fg: #16130e;
+  --fg-dim: #45413a;
+  --fg-faint: rgba(22, 19, 14, 0.55);
+  --rule: rgba(22, 19, 14, 0.16);
+  --steel: #6e6a61;
+}
+
+/* ───────── Tipografías ───────── */
+[data-font="editorial"] {
+  --f-display: var(--font-instrument-serif), Georgia, serif;
+  --f-sans: var(--font-inter-tight), Helvetica, sans-serif;
+}
+[data-font="modern"] {
+  --f-display: var(--font-inter-tight), Helvetica, sans-serif;
+  --f-sans: var(--font-inter-tight), Helvetica, sans-serif;
+}
+[data-font="techno"] {
+  --f-display: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --f-sans: var(--font-inter-tight), Helvetica, sans-serif;
+}
+
+/* ───────── Tweaks · densidad · radio · acento · contraste · motion · grano ─────────
+   Cada dimensión la pone el provider en <html>. Exponemos knobs
+   (--radius-base, --motion-scale, --grain-opacity...) que se referencian
+   donde importa; lo no knob-able cae al default. */
+
+[data-density="compact"]  { --gutter: clamp(16px, 3vw, 48px); --s-7: 64px;  --s-6: 44px; --s-5: 28px; }
+[data-density="normal"]   { /* defaults */ }
+[data-density="spacious"] { --gutter: clamp(24px, 5vw, 88px); --s-7: 128px; --s-6: 88px; --s-5: 56px; }
+
+/* Radio — default Backstage "sharp": esquinas 2px, lenguaje industrial.
+   Todo el sitio consume --radius-base (pills/chips/botones) y --radius-card
+   (tarjetas/paneles), así que el panel Tweaks no necesita listas de clases. */
+[data-radius="sharp"] { --radius-scale: 0;   --radius-base: 2px; }
+[data-radius="soft"]  { --radius-scale: 1;   --radius-base: 12px; }
+[data-radius="round"] { --radius-scale: 1.6; --radius-base: 999px; }
+
+/* Intensidad de acento — SIEMPRE sobre --accent-core (ver nota en :root) */
+[data-accent-intensity="subtle"] { --accent: color-mix(in srgb, var(--accent-core) 70%, var(--fg-dim)); }
+[data-accent-intensity="normal"] { /* defaults */ }
+/* "Fuerte" aclara el acento manteniendo el matiz (agnóstico de paleta: vale
+   tanto para el verde Backstage como para el naranja teco). */
+[data-accent-intensity="bold"]   { --accent: color-mix(in srgb, var(--accent-core) 82%, #ffffff); }
+[data-accent-intensity="bold"] .deck-core { filter: saturate(1.25) brightness(1.08); }
+
+[data-contrast="low"]    { --fg-dim: color-mix(in srgb, var(--fg) 55%, transparent); --fg-faint: color-mix(in srgb, var(--fg) 32%, transparent); }
+[data-contrast="normal"] { /* defaults */ }
+[data-contrast="high"]   { --fg-dim: var(--fg); --fg-faint: color-mix(in srgb, var(--fg) 75%, transparent); --rule: color-mix(in srgb, var(--fg) 28%, transparent); }
+
+/* Motion — lively acorta duraciones (0.55 = animaciones más rápidas; lo
+   consume también el JS de scroll/reveal vía getComputedStyle). */
+[data-motion="still"]  { --motion-scale: 0; }
+[data-motion="calm"]   { --motion-scale: 1; }
+[data-motion="lively"] { --motion-scale: 0.55; }
+[data-motion="still"] .deck-ring,
+[data-motion="still"] .deck-platter,
+[data-motion="still"] .deck-pulse,
+[data-motion="still"] .deck-core,
+[data-motion="still"] .deck-arm,
+[data-motion="still"] .orbit-node,
+[data-motion="still"] .dot-live,
+[data-motion="still"] .nav-cta-dot,
+[data-motion="still"] .hero-scroll-line::after,
+[data-motion="still"] .marquee__track { animation: none !important; }
+[data-motion="lively"] .deck-ring.r1 { animation-duration: 16s; }
+[data-motion="lively"] .deck-ring.r2 { animation-duration: 32s; }
+[data-motion="lively"] .deck-ring.r3 { animation-duration: 44s; }
+[data-motion="lively"] .deck-platter { animation-duration: 5s; }
+[data-motion="lively"] .deck-core    { animation-duration: 2.4s; }
+[data-motion="lively"] .marquee__track { animation-duration: 22s; }
+
+[data-grain="off"]    { --grain-opacity: 0; }
+[data-grain="subtle"] { --grain-opacity: 0.04; }
+[data-grain="strong"] { --grain-opacity: 0.085; }
+
+/* ───────── Glow de club — bloom proporcional a --glow-strength ─────────
+   Cualquier paleta puede llevar glow ("industrial" y "club" no son
+   excluyentes). Con strength 0 los calc() dan blur 0 a offset 0:
+   ninguna sombra visible. Se aplica en .btn--accent, .dot-live,
+   .nav-cta-dot, .session-play, .glow y los acentos del hero deck. */
+[data-glow="off"]    { --glow-strength: 0; }
+[data-glow="soft"]   { --glow-strength: 0.4; }
+[data-glow="strong"] { --glow-strength: 0.8; }
+
+.glow {
+  box-shadow: 0 0 calc(34px * var(--glow-strength)) color-mix(in srgb, var(--accent) 45%, transparent);
+  text-shadow: 0 0 calc(18px * var(--glow-strength)) color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+/* ───────── Textura industrial — overlay fijo en body::after ─────────
+   Convive con el grano (body::before). El color se mezcla sobre var(--fg)
+   para que funcione igual en paletas claras y oscuras. */
+[data-texture="off"]       { --texture-opacity: 0; }
+[data-texture="corrugado"] { --texture-opacity: 0.06; }
+[data-texture="hormigon"]  { --texture-opacity: 0.09; }
+[data-texture="malla"]     { --texture-opacity: 0.05; }
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: var(--texture-opacity);
+  mix-blend-mode: overlay;
+  /* default = corrugado: estrías verticales finas, chapa de contenedor */
+  background: repeating-linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--fg) 80%, transparent) 0 1px,
+    transparent 1px 6px,
+    color-mix(in srgb, var(--fg) 30%, transparent) 6px 7px,
+    transparent 7px 16px
+  );
+  transition: opacity 0.4s var(--easing);
+}
+[data-texture="hormigon"] body::after {
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='420' height='420'><filter id='c'><feTurbulence type='fractalNoise' baseFrequency='0.05' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23c)'/></svg>");
+  background-size: 420px 420px;
+  mix-blend-mode: soft-light;
+}
+[data-texture="malla"] body::after {
+  background:
+    linear-gradient(color-mix(in srgb, var(--fg) 60%, transparent) 1px, transparent 1px) 0 0 / 56px 56px,
+    linear-gradient(90deg, color-mix(in srgb, var(--fg) 60%, transparent) 1px, transparent 1px) 0 0 / 56px 56px;
+}
+[data-texture="off"] body::after { opacity: 0; }
+
+/* ───────── Reset / base ───────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--fg); }
+body {
+  font-family: var(--f-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01", "ss02";
+  overflow-x: hidden;
+  transition: background 0.5s var(--easing), color 0.5s var(--easing);
+}
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+img, svg { display: block; max-width: 100%; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+::selection { background: var(--accent); color: var(--accent-ink); }
+
+/* Grano sutil — fijo al viewport para que no scrollee. Tweaks ajusta
+   --grain-opacity (off/subtle/strong). */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  transition: opacity 0.4s var(--easing);
+}
+
+/* ───────── Layout ───────── */
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
+section { position: relative; padding: var(--s-7) 0; }
+.rule { height: 1px; background: var(--rule); width: 100%; }
+
+/* ───────── Tipografía ───────── */
+.eyebrow {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--fg-faint); }
+
+.display {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: clamp(48px, 8vw, 144px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.display em { font-style: italic; color: var(--steel); }
+
+.section-h {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: clamp(40px, 5.5vw, 88px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.section-h em { font-style: italic; color: var(--steel); }
+h3 {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: clamp(24px, 3vw, 40px);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+.lede {
+  font-size: clamp(18px, 1.6vw, 22px);
+  line-height: 1.45;
+  color: var(--fg-dim);
+  max-width: 55ch;
+  text-wrap: pretty;
+}
+.mono { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.05em; }
+
+.num {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--fg-faint);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.num::before { content: "["; }
+.num::after { content: "]"; }
+
+/* ───────── Nav ───────── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px var(--gutter);
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.04em;
+  mix-blend-mode: difference; color: #fff;
+}
+.nav-logo { display: inline-flex; align-items: center; gap: 10px; color: #fff; }
+.nav-mark { height: 26px; width: auto; display: block; flex-shrink: 0; }
+.nav-lockup { height: 24px; width: auto; display: none; flex-shrink: 0; }
+.nav-wordmark { font-family: var(--f-display); font-size: 22px; letter-spacing: -0.01em; white-space: nowrap; }
+/* Verde Backstage inline (no var): mix-blend-mode difference en el ancestro
+   invertiría el color derivado de var(--accent); sobre fondos oscuros queda
+   verde estable (difference contra negro ≈ identidad). */
+.nav-wordmark > span { color: #a3cc33; }
+
+/* Modos de logo (data-logo, desde Tweaks): marca = icono + texto (default),
+   icono = solo icono, texto = solo wordmark, lockup = lockup horizontal. */
+[data-logo="icono"]  .nav-wordmark { display: none; }
+[data-logo="texto"]  .nav-mark { display: none; }
+[data-logo="lockup"] .nav-mark,
+[data-logo="lockup"] .nav-wordmark { display: none; }
+[data-logo="lockup"] .nav-lockup { display: block; }
+/* Tema claro: el lockup a color necesita respaldo oscuro para no perderse. */
+[data-theme="light"][data-logo="lockup"] .nav-lockup {
+  background: #0e0e0c; padding: 4px 8px; border-radius: var(--radius-base);
+}
+
+/* Hamburguesa — solo móvil (ver media query). Hereda el blanco del nav. */
+.nav-burger {
+  display: none; flex-direction: column; gap: 5px; width: 40px; height: 40px;
+  align-items: center; justify-content: center; padding: 0;
+  background: transparent; border: 0; cursor: pointer; color: inherit;
+}
+.nav-burger span { width: 22px; height: 2px; background: currentColor; border-radius: 2px;
+  transition: transform 0.25s var(--easing), opacity 0.2s; }
+.nav-burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.nav-burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Menú móvil — hermano del <nav> (fuera del mix-blend-mode difference, por eso
+   los colores con var() se ven correctos). */
+.nav-mobile-back { position: fixed; inset: 0; z-index: 48; background: rgba(0, 0, 0, 0.45); }
+.nav-mobile {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 49;
+  padding: 78px var(--gutter) 30px;
+  background: color-mix(in srgb, var(--bg) 93%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(150%); backdrop-filter: blur(18px) saturate(150%);
+  border-bottom: 1px solid var(--rule);
+  animation: navMobileIn 0.28s var(--easing);
+}
+.nav-mobile ul { list-style: none; display: flex; flex-direction: column; gap: 0; }
+.nav-mobile li { border-bottom: 1px solid var(--rule); }
+.nav-mobile a {
+  display: flex; align-items: baseline; justify-content: space-between;
+  font-family: var(--f-display); font-size: 30px; letter-spacing: -0.01em;
+  padding: 14px 2px; color: var(--fg);
+}
+.nav-mobile a.active { color: var(--accent); }
+.nav-mobile a .nav-mobile-idx { font-family: var(--f-mono); font-size: 11px; color: var(--fg-faint); }
+.nav-mobile .nav-mobile-cta { margin-top: 22px; width: 100%; justify-content: center; }
+@keyframes navMobileIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+.nav ul { display: flex; gap: 28px; list-style: none; }
+.nav a { position: relative; padding: 6px 0; }
+.nav a::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: currentColor; transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s var(--easing);
+}
+.nav a:hover::after, .nav a.active::after { transform: scaleX(1); }
+.nav-cta {
+  display: inline-flex; align-items: center; gap: 9px;
+  border: 1.5px solid currentColor; padding: 9px 16px 9px 13px;
+  border-radius: var(--radius-base);
+  transition: background 0.3s var(--easing), color 0.3s var(--easing),
+              transform 0.25s var(--easing);
+}
+.nav-cta::after { display: none; }
+.nav-cta-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #a3cc33; /* inline por el mix-blend-mode (ver .nav-logo span) */
+  box-shadow: 0 0 0 0 rgba(163, 204, 51, 0.7);
+  filter: drop-shadow(0 0 calc(7px * var(--glow-strength)) rgba(163, 204, 51, 0.8));
+  animation: navCtaPulse 2.4s infinite; flex-shrink: 0;
+}
+@keyframes navCtaPulse {
+  0%   { box-shadow: 0 0 0 0    rgba(163, 204, 51, 0.7); }
+  100% { box-shadow: 0 0 0 10px rgba(163, 204, 51, 0); }
+}
+.nav-cta-arrow {
+  display: inline-block; transition: transform 0.3s var(--easing);
+  font-family: var(--f-mono);
+}
+.nav-cta:hover { background: #fff; color: #000; transform: translateY(-1px); }
+.nav-cta:hover .nav-cta-arrow { transform: translateX(3px); }
+.nav-cta:hover .nav-cta-dot { animation-duration: 1.2s; }
+
+/* ───────── Botones ───────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 22px; border-radius: var(--radius-base);
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+  border: 1px solid var(--fg); color: var(--fg); background: transparent;
+  transition: background 0.35s var(--easing), color 0.35s var(--easing),
+              transform 0.25s var(--easing), box-shadow 0.35s var(--easing);
+  position: relative; overflow: hidden;
+  cursor: pointer;
+}
+.btn:hover { background: var(--fg); color: var(--bg); }
+.btn--solid { background: var(--fg); color: var(--bg); }
+.btn--solid:hover { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn--accent {
+  background: var(--accent); border-color: var(--accent); color: var(--accent-ink);
+  box-shadow: 0 0 calc(30px * var(--glow-strength)) color-mix(in srgb, var(--accent) 50%, transparent);
+}
+.btn--accent:hover { background: transparent; color: var(--accent); }
+.btn .arrow { display: inline-block; transition: transform 0.35s var(--easing); }
+.btn:hover .arrow { transform: translateX(4px); }
+.btn:disabled { opacity: 0.6; cursor: progress; }
+
+/* ───────── Animaciones de reveal ─────────
+   Visible por defecto; .reveal-ready en <html> (post-hidratación) activa
+   la animación de entrada. Un fallo de JS nunca deja la página en blanco. */
+.reveal-ready [data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity var(--dur) var(--easing), transform var(--dur) var(--easing);
+}
+.reveal-ready [data-reveal].is-in { opacity: 1; transform: none; }
+[data-reveal-delay="1"] { transition-delay: 0.08s; }
+[data-reveal-delay="2"] { transition-delay: 0.16s; }
+[data-reveal-delay="3"] { transition-delay: 0.24s; }
+[data-reveal-delay="4"] { transition-delay: 0.32s; }
+[data-reveal-delay="5"] { transition-delay: 0.4s; }
+
+[data-reveal="char"] .word { display: inline-block; white-space: nowrap; }
+[data-reveal="char"] .ch {
+  display: inline-block; opacity: 0; transform: translateY(0.6em);
+  transition: opacity 0.8s var(--easing), transform 0.8s var(--easing);
+}
+.reveal-ready [data-reveal="char"]:not(.is-in) .ch { opacity: 0; }
+[data-reveal="char"].is-in .ch { opacity: 1; transform: none; }
+
+/* ───────── Marquee ───────── */
+.marquee {
+  display: flex; overflow: hidden; gap: 0;
+  border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  padding: 28px 0;
+}
+.marquee__track {
+  display: flex; gap: 64px; flex-shrink: 0;
+  animation: marquee 40s linear infinite;
+  font-family: var(--f-display); font-size: clamp(28px, 4vw, 56px);
+  letter-spacing: -0.01em; white-space: nowrap;
+}
+.marquee__track span { display: inline-flex; align-items: center; gap: 64px; }
+/* Cuadrado, no círculo: separador con lenguaje industrial */
+.marquee__track .dot { width: 9px; height: 9px; border-radius: 1px; background: var(--accent); display: inline-block; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* ───────── Footer ───────── */
+.footer {
+  border-top: 1px solid var(--rule);
+  padding: var(--s-6) 0 var(--s-4);
+  font-family: var(--f-mono); font-size: 12px;
+  color: var(--fg-faint);
+}
+.footer .grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: var(--s-5); align-items: start; }
+.footer h4 {
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--fg); font-weight: 500; margin-bottom: 14px;
+}
+.footer ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.footer a:hover { color: var(--fg); }
+.footer-mark { height: 46px; width: auto; display: block; margin-bottom: 18px; }
+[data-logo="texto"] .footer-mark { display: none; }
+.footer-big {
+  font-family: var(--f-display); font-size: clamp(72px, 15vw, 240px); line-height: 0.85;
+  color: var(--fg); letter-spacing: -0.04em; padding: 60px 0 0;
+  white-space: nowrap; overflow: hidden;
+}
+.footer-bottom {
+  display: flex; justify-content: space-between;
+  padding-top: var(--s-4); margin-top: var(--s-4); border-top: 1px solid var(--rule);
+}
+
+/* ───────── Cursor follower ───────── */
+.cursor-blob {
+  position: fixed; pointer-events: none; z-index: 5;
+  width: 300px; height: 300px; border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 20%, transparent), transparent 60%);
+  transform: translate(-50%, -50%); transition: opacity 0.4s;
+  filter: blur(20px); opacity: 0;
+}
+
+/* ───────── WhatsApp float ───────── */
+.wa-float {
+  position: fixed; bottom: 24px; right: 24px; z-index: 40;
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 20px; background: #25d366; color: #0d0d0b;
+  border-radius: var(--radius-base);
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.06em;
+  box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3);
+  transition: transform 0.3s var(--easing);
+}
+.wa-float:hover { transform: translateY(-3px); }
+
+/* ───────── Utilidades ───────── */
+.text-steel { color: var(--steel); }
+.text-accent { color: var(--accent); }
+.text-faint { color: var(--fg-faint); }
+.italic { font-style: italic; }
+.small { font-size: 13px; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   HERO — variantes deck / rejilla / tipo (driven por [data-hero])
+   Markup esperado por el visual (variante deck, la default):
+
+     <div class="hero-visual">
+       <div class="deck">
+         <span class="deck-ring r3" />
+         <span class="deck-ring r2" />
+         <span class="deck-ring r1" />
+         <span class="deck-platter" />
+         <span class="deck-pulse" />
+         <span class="deck-core" />
+         <span class="deck-arm" />
+         <a class="orbit-node n1">DJs</a>      … hasta .n5
+       </div>
+     </div>
+
+   "rejilla" oculta la maquinaria del plato y pinta retícula industrial;
+   "tipo" lo oculta todo y pinta "REC / MIX / LIVE" en stencil via ::after.
+   ───────────────────────────────────────────────────────────────────── */
+
+.hero {
+  min-height: 100vh; padding-top: 140px; padding-bottom: 80px;
+  display: flex; align-items: center; overflow: hidden;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr auto auto;
+  grid-template-areas:
+    "meta meta"
+    "h    visual"
+    "side visual"
+    "scroll scroll";
+  gap: var(--s-5) var(--s-6);
+  width: 100%;
+}
+.hero-meta {
+  grid-area: meta; display: flex; justify-content: space-between;
+  padding-bottom: var(--s-4); border-bottom: 1px solid var(--rule);
+}
+.hero-status { display: flex; align-items: center; gap: 8px; }
+.dot-live {
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  filter: drop-shadow(0 0 calc(8px * var(--glow-strength)) color-mix(in srgb, var(--accent) 80%, transparent));
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0    color-mix(in srgb, var(--accent) 60%, transparent); }
+  100% { box-shadow: 0 0 0 12px transparent; }
+}
+.hero-h { grid-area: h; }
+.hero-side { grid-area: side; display: flex; flex-direction: column; gap: var(--s-4); justify-content: flex-end; }
+.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-visual { grid-area: visual; position: relative; min-height: 420px; }
+.hero-scroll {
+  grid-area: scroll; display: flex; align-items: center; gap: 14px;
+  padding-top: var(--s-4); border-top: 1px solid var(--rule);
+}
+.hero-scroll-line { flex: 1; height: 1px; background: var(--rule); position: relative; overflow: hidden; }
+.hero-scroll-line::after {
+  content: ""; position: absolute; left: -30%; top: 0; bottom: 0; width: 30%;
+  background: var(--accent); animation: slide 3s var(--easing) infinite;
+}
+@keyframes slide { to { left: 100%; } }
+
+/* Visual deck — plato/tornamesa orbital */
+.deck { position: absolute; inset: 0; display: grid; place-items: center; }
+.deck-ring {
+  position: absolute; border: 1px solid var(--rule); border-radius: 50%;
+  animation: spin 40s linear infinite;
+}
+.deck-ring.r1 { width: 300px; height: 300px; border-color: color-mix(in srgb, var(--accent) 35%, transparent); animation-duration: 30s; }
+.deck-ring.r2 { width: 440px; height: 440px; animation-duration: 60s; animation-direction: reverse; }
+.deck-ring.r3 { width: 580px; height: 580px; border-style: dashed; animation-duration: 80s; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Vinilo: surcos con repeating-radial-gradient + marca de giro en el borde */
+.deck-platter {
+  position: absolute; width: 340px; height: 340px; border-radius: 50%;
+  background:
+    repeating-radial-gradient(circle at center, color-mix(in srgb, var(--fg) 7%, transparent) 0 1px, transparent 1px 5px),
+    radial-gradient(circle at 34% 30%, color-mix(in srgb, var(--fg) 10%, var(--bg-2)), var(--bg) 72%);
+  box-shadow: inset 0 0 48px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--rule);
+  animation: spin 9s linear infinite;
+}
+.deck-platter::after {
+  content: ""; position: absolute; top: 14px; left: calc(50% - 3px);
+  width: 6px; height: 6px; border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 75%, transparent);
+}
+
+/* Galleta central con glow naranja + agujero del eje */
+.deck-core {
+  position: relative; z-index: 2; width: 96px; height: 96px; border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, var(--accent), color-mix(in srgb, var(--accent) 38%, #000) 72%);
+  box-shadow: 0 0 calc(70px * var(--glow-strength)) color-mix(in srgb, var(--accent) 50%, transparent),
+              inset -10px -10px 26px rgba(0, 0, 0, 0.4);
+  display: grid; place-items: center;
+  animation: coreBreath 4s ease-in-out infinite;
+}
+.deck-core::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--bg); }
+@keyframes coreBreath {
+  0%, 100% { box-shadow: 0 0 calc(60px * var(--glow-strength)) color-mix(in srgb, var(--accent) 45%, transparent), inset -10px -10px 26px rgba(0, 0, 0, 0.4); }
+  50%      { box-shadow: 0 0 calc(95px * var(--glow-strength)) color-mix(in srgb, var(--accent) 65%, transparent), inset -10px -10px 26px rgba(0, 0, 0, 0.4); }
+}
+.deck-pulse {
+  position: absolute; width: 96px; height: 96px; border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  animation: corePulse 3.2s var(--easing) infinite;
+  pointer-events: none; z-index: 1;
+}
+@keyframes corePulse {
+  0%   { transform: scale(1);   opacity: 0.9; }
+  100% { transform: scale(3.4); opacity: 0;   }
+}
+
+/* Brazo/aguja sugerido: pivote arriba a la derecha, cápsula sobre el plato */
+.deck-arm {
+  position: absolute; z-index: 3;
+  top: 22%; left: 56%;
+  width: 190px; height: 2px;
+  background: linear-gradient(90deg, var(--steel), color-mix(in srgb, var(--steel) 35%, transparent));
+  transform-origin: 0 50%;
+  transform: rotate(124deg);
+  animation: armDrift 9s ease-in-out infinite alternate;
+}
+.deck-arm::before {
+  content: ""; position: absolute; left: -7px; top: -6px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--steel);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--steel) 30%, transparent);
+}
+.deck-arm::after {
+  content: ""; position: absolute; right: -2px; top: -4px;
+  width: 14px; height: 10px; border-radius: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 calc(12px * var(--glow-strength)) color-mix(in srgb, var(--accent) 70%, transparent);
+}
+@keyframes armDrift {
+  from { transform: rotate(122deg); }
+  to   { transform: rotate(127deg); }
+}
+
+/* Nodos orbitales etiquetables (DJs / salas / sellos / productoras…) */
+.orbit-node {
+  position: absolute; padding: 7px 12px; border: 1px solid var(--rule);
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  border-radius: var(--radius-base);
+  font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  transition: color 0.4s var(--easing), border-color 0.4s var(--easing),
+              box-shadow 0.4s var(--easing), transform 0.4s var(--easing);
+  animation: nodeFloat 6s ease-in-out infinite;
+  z-index: 4;
+}
+.orbit-node:hover {
+  color: var(--accent); border-color: var(--accent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 35%, transparent);
+  transform: translateY(-1px);
+}
+@keyframes nodeFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+.orbit-node.n1 { top: 8%;     left: 30%;  animation-delay: 0s;   }
+.orbit-node.n2 { top: 24%;    right: 8%;  animation-delay: 1.2s; }
+.orbit-node.n3 { bottom: 14%; right: 18%; animation-delay: 2.4s; }
+.orbit-node.n4 { bottom: 20%; left: 8%;   animation-delay: 3.6s; }
+.orbit-node.n5 { top: 50%;    left: -2%;  animation-delay: 4.8s; }
+
+/* Variante "rejilla" — retícula industrial */
+[data-hero="rejilla"] .deck {
+  background:
+    linear-gradient(var(--rule) 1px, transparent 1px) 0 0 / 40px 40px,
+    linear-gradient(90deg, var(--rule) 1px, transparent 1px) 0 0 / 40px 40px;
+  border: 1px solid var(--rule); border-radius: 2px;
+}
+[data-hero="rejilla"] .deck-ring,
+[data-hero="rejilla"] .deck-platter,
+[data-hero="rejilla"] .deck-arm,
+[data-hero="rejilla"] .deck-pulse { display: none; }
+[data-hero="rejilla"] .deck-core {
+  border-radius: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 calc(90px * var(--glow-strength)) color-mix(in srgb, var(--accent) 60%, transparent);
+  animation: none;
+}
+[data-hero="rejilla"] .deck-core::after { display: none; }
+
+/* Variante "tipo" — tipográfico stencil */
+[data-hero="tipo"] .hero-visual { display: flex; align-items: center; justify-content: flex-start; }
+[data-hero="tipo"] .deck { position: relative; inset: auto; min-height: 300px; }
+[data-hero="tipo"] .deck-ring,
+[data-hero="tipo"] .deck-platter,
+[data-hero="tipo"] .deck-core,
+[data-hero="tipo"] .deck-pulse,
+[data-hero="tipo"] .deck-arm,
+[data-hero="tipo"] .orbit-node { display: none; }
+[data-hero="tipo"] .hero-visual::after {
+  content: "REC /\A MIX /\A LIVE";
+  white-space: pre;
+  align-self: center;
+  font-family: var(--f-sans); font-weight: 800; text-transform: uppercase;
+  font-size: clamp(64px, 8vw, 150px); line-height: 0.95; letter-spacing: 0.01em;
+  color: transparent; -webkit-text-stroke: 2px var(--fg);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   REUTILIZABLES — chips, badges, stats, big CTA, póster, filtros
+   ───────────────────────────────────────────────────────────────────── */
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border: 1px solid var(--rule); border-radius: var(--radius-base);
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.05em;
+  color: var(--fg-dim); background: transparent;
+  transition: border-color 0.3s var(--easing), color 0.3s var(--easing),
+              background 0.3s var(--easing);
+}
+a.chip:hover, button.chip:hover { border-color: var(--fg-dim); color: var(--fg); }
+.chip.active { background: var(--fg); border-color: var(--fg); color: var(--bg); }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 9px; border-radius: var(--radius-base);
+  background: color-mix(in srgb, var(--fg) 8%, transparent);
+  font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--fg-dim);
+}
+
+.stats-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s-5);
+  padding: var(--s-5) 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+}
+.stat-num { font-family: var(--f-display); font-size: clamp(56px, 8vw, 112px); line-height: 1; letter-spacing: -0.03em; }
+.stat-lbl { margin-top: 8px; color: var(--fg-faint); font-size: 11px; letter-spacing: 0.06em; font-family: var(--f-mono); text-transform: uppercase; }
+
+.bigcta { padding: var(--s-8) 0; }
+.bigcta .num { margin-bottom: var(--s-3); }
+.bigcta-h { margin: var(--s-4) 0 var(--s-6); }
+.bigcta-row {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  padding-top: var(--s-5); border-top: 1px solid var(--rule);
+}
+
+/* Marco para los pósters SVG deterministas (y fotos drop-in si llegan) */
+.poster-frame {
+  position: relative; overflow: hidden;
+  border: 1px solid var(--rule); background: var(--bg-2);
+  border-radius: var(--radius-card);
+}
+.poster-frame img, .poster-frame svg { width: 100%; height: 100%; object-fit: cover; }
+.poster-frame::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fg) 4%, transparent);
+}
+
+/* Barra de filtros de catálogo (sesiones/eventos) — los botones internos
+   son .chip; el estado activo lo marca .chip.active */
+.filter-bar {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  padding: 8px; border: 1px solid var(--rule); border-radius: var(--radius-base);
+  width: fit-content; max-width: 100%;
+  margin-bottom: var(--s-5);
+}
+.filter-bar .chip { cursor: pointer; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   INDUSTRIAL — corrugado, cinta de obra, stencil
+   ───────────────────────────────────────────────────────────────────── */
+
+/* Banda decorativa de chapa corrugada (separador de secciones) */
+.corrugate {
+  min-height: 48px;
+  background: repeating-linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--fg) 9%, transparent) 0 2px,
+    transparent 2px 9px,
+    color-mix(in srgb, var(--fg) 4%, transparent) 9px 11px,
+    transparent 11px 18px
+  );
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+/* Cinta de obra: rayas 45° naranja/negro. El texto interior (span/b) va en
+   chip negro para ser legible sobre las rayas. Siempre sin radio. */
+.tape {
+  display: flex; align-items: center; gap: 14px;
+  min-height: 14px; padding: 10px 14px;
+  background: repeating-linear-gradient(45deg, var(--accent) 0 22px, #16120c 22px 44px);
+  border-radius: 0;
+}
+.tape span, .tape b {
+  font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; font-weight: 500;
+  background: #16120c; color: var(--accent);
+  padding: 4px 10px;
+}
+
+/* Texto stencil hueco (plantilla de spray) */
+.stencil {
+  font-family: var(--f-sans); font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  font-size: clamp(36px, 5vw, 80px); line-height: 1;
+  color: transparent; -webkit-text-stroke: 1.5px var(--fg);
+}
+.stencil--accent { -webkit-text-stroke-color: var(--accent); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   ARTISTAS — roster de residentes e invitados
+   ───────────────────────────────────────────────────────────────────── */
+
+.artist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); }
+.artist-card {
+  display: flex; flex-direction: column;
+  border: 1px solid var(--rule); background: var(--bg-2);
+  border-radius: var(--radius-card); overflow: hidden;
+  transition: transform 0.4s var(--easing), border-color 0.4s var(--easing);
+}
+.artist-card:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--rule));
+}
+.artist-card-media {
+  aspect-ratio: 4 / 5; overflow: hidden; position: relative;
+  background: var(--bg-2); border-bottom: 1px solid var(--rule);
+}
+.artist-card-media img, .artist-card-media svg {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.6s var(--easing);
+}
+.artist-card:hover .artist-card-media img,
+.artist-card:hover .artist-card-media svg { transform: scale(1.04); }
+.artist-card-body {
+  padding: 18px; flex: 1;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.artist-card-role {
+  font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--accent);
+}
+.artist-tag {
+  display: inline-flex; align-items: center;
+  padding: 4px 9px; border: 1px solid var(--rule); border-radius: var(--radius-base);
+  font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--fg-faint);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SESIONES — catálogo de sets con UI de player
+   Waveform: el componente pinta N <span> con la altura sembrada por slug
+   (seededHash), p. ej. <span style="--h:0.62" />.
+   ───────────────────────────────────────────────────────────────────── */
+
+.session-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s-4); }
+.session-card {
+  display: flex; flex-direction: column; gap: 16px;
+  padding: 22px; border: 1px solid var(--rule); background: var(--bg-2);
+  border-radius: var(--radius-card);
+  transition: border-color 0.4s var(--easing), transform 0.4s var(--easing);
+}
+.session-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--rule));
+  transform: translateY(-3px);
+}
+.session-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.session-meta {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.05em;
+  color: var(--fg-faint);
+}
+.session-wave {
+  display: flex; align-items: flex-end; gap: 3px;
+  height: 56px; padding-bottom: 2px;
+  border-bottom: 1px solid var(--rule);
+}
+.session-wave span {
+  flex: 1 1 0; min-width: 2px; border-radius: 1px;
+  height: calc(var(--h, 0.5) * 100%);
+  background: color-mix(in srgb, var(--steel) 55%, transparent);
+  transition: background 0.35s var(--easing);
+}
+.session-card:hover .session-wave span { background: color-mix(in srgb, var(--accent) 70%, transparent); }
+
+/* Botón play circular (jog wheel): mantiene el círculo en cualquier radio.
+   Si va vacío pinta su propio triángulo; con icono propio, lo respeta. */
+.session-play {
+  width: 48px; height: 48px; flex-shrink: 0;
+  border: 1px solid var(--accent); border-radius: 50%;
+  color: var(--accent);
+  display: grid; place-items: center;
+  box-shadow: 0 0 calc(26px * var(--glow-strength)) color-mix(in srgb, var(--accent) 45%, transparent);
+  transition: background 0.3s var(--easing), color 0.3s var(--easing),
+              transform 0.3s var(--easing);
+}
+.session-play:empty::before { content: "▶"; font-size: 13px; line-height: 1; translate: 1px 0; }
+.session-play:hover { background: var(--accent); color: var(--accent-ink); transform: scale(1.05); }
+
+.platform-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border: 1px solid var(--rule); border-radius: var(--radius-base);
+  font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--fg-dim);
+}
+.platform-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--steel); }
+.platform-badge[data-platform="youtube"]::before { background: #e53d2e; }
+.platform-badge[data-platform="soundcloud"]::before { background: var(--accent); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   EVENTOS — agenda en filas
+   Fecha en bloque mono grande: <div class="event-date"><b>14</b><span>JUN</span></div>
+   Tipo via atributo (preferido) o clase modificadora:
+   <span class="event-type" data-type="sesion|juntada|showcase|b2b">
+   ───────────────────────────────────────────────────────────────────── */
+
+.events-list { display: flex; flex-direction: column; border-top: 1px solid var(--rule); }
+.event-row {
+  display: grid;
+  grid-template-columns: 110px 1fr auto auto;
+  gap: var(--s-4);
+  align-items: center;
+  padding: 26px 4px;
+  border-bottom: 1px solid var(--rule);
+  position: relative;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  transition: padding 0.35s var(--easing);
+}
+.event-row::before {
+  content: ""; position: absolute; left: -20px; right: -20px; top: 0; bottom: 0;
+  background: transparent; transition: background 0.35s var(--easing);
+  z-index: -1; border-radius: var(--radius-card);
+}
+.event-row:hover { padding-left: 18px; }
+.event-row:hover::before { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+
+.event-date { font-family: var(--f-mono); display: flex; flex-direction: column; line-height: 1; }
+.event-date b {
+  font-size: 30px; font-weight: 600; letter-spacing: -0.02em; color: var(--fg);
+}
+.event-date span {
+  margin-top: 4px; font-size: 11px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--fg-faint);
+}
+
+.event-lineup {
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.04em;
+  color: var(--fg-dim);
+}
+
+/* Badge de tipo — colores diferenciados por color-mix sobre el acento vivo,
+   así siguen al slider de matiz y a la paleta. */
+.event-type {
+  --type-c: var(--steel);
+  display: inline-flex; align-items: center;
+  padding: 5px 10px; border-radius: var(--radius-base);
+  font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--type-c);
+  border: 1px solid color-mix(in srgb, var(--type-c) 45%, transparent);
+  background: color-mix(in srgb, var(--type-c) 10%, transparent);
+}
+.event-type[data-type="sesion"],   .event-type--sesion   { --type-c: var(--accent); }
+.event-type[data-type="juntada"],  .event-type--juntada  { --type-c: color-mix(in srgb, var(--accent) 40%, #7fae74); }
+.event-type[data-type="showcase"], .event-type--showcase { --type-c: color-mix(in srgb, var(--accent) 45%, #d8b13a); }
+.event-type[data-type="b2b"],      .event-type--b2b      { --type-c: color-mix(in srgb, var(--accent) 35%, #b07fe0); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   CONTACTO — form, chips, progress, success, honeypot
+   Sin campo de presupuesto: se pregunta tipo de sesión / formato / plazo.
+   ───────────────────────────────────────────────────────────────────── */
+
+.ct-hero { padding-top: 140px; padding-bottom: var(--s-7); min-height: 100vh; }
+.ct-grid {
+  display: grid; grid-template-columns: 1fr 1.1fr;
+  gap: var(--s-7); align-items: start;
+}
+.ct-left { position: sticky; top: 120px; }
+.ct-h { margin: var(--s-3) 0 0; }
+
+.ct-info {
+  margin-top: var(--s-5); padding-top: var(--s-4);
+  border-top: 1px solid var(--rule);
+  display: flex; flex-direction: column; gap: 14px;
+}
+.ct-info-row {
+  display: grid; grid-template-columns: 120px 1fr; gap: 14px; align-items: baseline;
+  font-size: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--rule);
+}
+.ct-info-row:last-child { border-bottom: none; }
+.ct-info-row a:hover { color: var(--accent); }
+
+.ct-form {
+  display: flex; flex-direction: column; gap: var(--s-4);
+  padding: var(--s-5);
+  background: var(--bg-2); border: 1px solid var(--rule); border-radius: var(--radius-card);
+}
+
+.ct-progress {
+  display: flex; align-items: center; gap: 14px;
+  padding-bottom: var(--s-3); border-bottom: 1px solid var(--rule);
+}
+.ct-progress-bar {
+  flex: 1; height: 2px; background: var(--rule); border-radius: 2px;
+  position: relative; overflow: hidden;
+}
+.ct-progress-bar::after {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+  width: var(--p, 0%); background: var(--accent);
+  transition: width 0.5s var(--easing);
+}
+.ct-progress-label { font-size: 11px; color: var(--fg); font-family: var(--f-mono); }
+
+.ct-field { display: flex; flex-direction: column; gap: 8px; position: relative; }
+.ct-field label {
+  font-size: 14px; color: var(--fg-dim); display: flex; align-items: baseline; gap: 10px;
+}
+.ct-field label .mono { color: var(--fg-faint); font-size: 11px; letter-spacing: 0.06em; }
+
+.ct-field input,
+.ct-field textarea {
+  width: 100%; padding: 14px 0; background: transparent;
+  border: none; border-bottom: 1px solid var(--rule);
+  color: var(--fg); font-family: var(--f-sans); font-size: 16px;
+  transition: border-color 0.3s var(--easing);
+  outline: none; resize: vertical;
+}
+.ct-field input:focus,
+.ct-field textarea:focus { border-bottom-color: var(--accent); }
+.ct-field.has-error input,
+.ct-field.has-error textarea { border-bottom-color: var(--err); }
+
+.ct-err {
+  font-family: var(--f-mono); font-size: 11px; color: var(--err);
+  min-height: 16px; opacity: 0; transition: opacity 0.25s;
+}
+.ct-field.has-error .ct-err { opacity: 1; }
+
+.ct-count { font-size: 10px; color: var(--fg-faint); align-self: flex-end; letter-spacing: 0.04em; font-family: var(--f-mono); }
+
+.ct-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.ct-chip {
+  padding: 9px 14px; border: 1px solid var(--rule); border-radius: var(--radius-base);
+  background: transparent; color: var(--fg-dim);
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.04em;
+  transition: border-color 0.3s var(--easing), color 0.3s var(--easing),
+              background 0.3s var(--easing);
+}
+.ct-chip:hover { border-color: var(--fg-dim); color: var(--fg); }
+.ct-chip.active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.ct-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.ct-actions { display: flex; gap: 12px; flex-wrap: wrap; padding-top: var(--s-3); border-top: 1px solid var(--rule); }
+.ct-disclaimer { font-size: 11px; line-height: 1.5; }
+.ct-disclaimer a { color: var(--fg-dim); text-decoration: underline; }
+
+/* Honeypot — invisible pero input real para que los bots lo rellenen */
+.ct-honeypot {
+  position: absolute; left: -10000px; top: auto;
+  width: 1px; height: 1px; overflow: hidden;
+}
+
+/* Éxito */
+.ct-success {
+  grid-column: 1 / -1;
+  text-align: center; padding: var(--s-7) 0;
+  display: flex; flex-direction: column; align-items: center;
+  animation: fadeInUp 0.8s var(--easing);
+}
+.ct-success-mark { color: var(--accent); }
+.ct-success-mark circle {
+  stroke-dasharray: 200; stroke-dashoffset: 200;
+  animation: dash 1s var(--easing) forwards;
+}
+.ct-success-mark path {
+  stroke-dasharray: 60; stroke-dashoffset: 60;
+  animation: dash 1s 0.7s var(--easing) forwards;
+}
+@keyframes dash { to { stroke-dashoffset: 0; } }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ───────── Panel Tweaks — radios ─────────
+   El panel (components/tweaks/panel.tsx, <style> propio heredado del patrón)
+   consume directamente --radius-base / --radius-card; estos overrides solo
+   cubren el caso de radios hardcodeados residuales en el port. */
+[data-radius="sharp"] .twk-fab,
+[data-radius="sharp"] .twk-panel,
+[data-radius="sharp"] .twk-chip { border-radius: 2px; }
+[data-radius="round"] .twk-fab,
+[data-radius="round"] .twk-chip { border-radius: 999px; }
+[data-radius="round"] .twk-panel { border-radius: 22px; }
+
+/* ───────── Responsive ───────── */
+@media (max-width: 980px) {
+  .hero { padding-top: 120px; }
+  .hero-grid { grid-template-columns: 1fr; grid-template-areas: "meta" "h" "side" "visual" "scroll"; }
+  .hero-visual { min-height: 340px; }
+  .deck-ring.r3 { width: 460px; height: 460px; }
+  .deck-ring.r2 { width: 380px; height: 380px; }
+  .deck-platter { width: 280px; height: 280px; }
+  .artist-grid { grid-template-columns: repeat(2, 1fr); }
+  .session-grid { grid-template-columns: 1fr; }
+  .event-row { grid-template-columns: 84px 1fr auto; }
+  .event-lineup { grid-column: 2; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .ct-grid { grid-template-columns: 1fr; }
+  .ct-left { position: relative; top: auto; }
+  .ct-info-row { grid-template-columns: 100px 1fr; }
+}
+
+@media (max-width: 900px) {
+  .footer .grid { grid-template-columns: 1fr 1fr; gap: var(--s-4); }
+  /* Móvil: ocultar links desktop + CTA inline; el menú vive tras la hamburguesa. */
+  .nav ul { display: none; }
+  .nav > .nav-cta { display: none; }
+  .nav-burger { display: inline-flex; }
+}
+
+@media (max-width: 640px) {
+  .artist-grid { grid-template-columns: 1fr; }
+  /* La fila de evento colapsa: fecha + contenido; lo demás baja alineado
+     con el contenido (badge de tipo, acción) */
+  .event-row { grid-template-columns: 64px 1fr; row-gap: 10px; }
+  .event-row > :nth-child(n + 3) { grid-column: 2; justify-self: start; }
+  .filter-bar { width: 100%; }
+  /* Flotantes: el WhatsApp pasa a icono y sube por encima del FAB de Tweaks
+     para no taparse entre sí ni cubrir el contenido (poster de /eventos). */
+  .wa-float { bottom: 74px; right: 16px; padding: 13px; gap: 0; }
+  .wa-float .mono { display: none; }
+}
+
+/* ───────── Reduced motion ───────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .marquee__track { animation: none; }
+  .deck-ring, .deck-platter, .deck-pulse, .deck-core, .deck-arm { animation: none; }
+  .orbit-node { animation: none; }
+  .dot-live { animation: none; box-shadow: none; }
+  .nav-cta-dot { animation: none; box-shadow: none; }
+  .hero-scroll-line::after { animation: none; }
+  .reveal-ready [data-reveal] { opacity: 1; transform: none; transition: none; }
+  .reveal-ready [data-reveal="char"] .ch { opacity: 1; transform: none; transition: none; }
+}

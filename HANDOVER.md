@@ -2,7 +2,7 @@
 
 > Índice maestro del proyecto. **Carga obligatoria al inicio de cualquier sesión nueva**. Mapa "para hacer X, lee Y" + estado actual + changelog cronológico + referencias externas.
 > Diseñado para que un agente IA retome el desarrollo con la mínima fricción cargando solo lo necesario.
-> Última actualización: 2026-06-04.
+> Última actualización: 2026-06-16.
 
 ---
 
@@ -12,7 +12,7 @@
 
 **Stack**: Next.js 15 · React 19 · TS strict · Tailwind v4 (CSS vars) · framer-motion · lenis · Tweaks Pro ampliado · Resend (diferido).
 
-**Producción**: objetivo `https://brecords.unlimited-systems.net` (VPS Contabo, no desplegado aún).
+**Producción**: ✅ **en vivo** en `https://brecords.unlimited-systems.net` (VPS Contabo, `backstage-web.service` :3001, desplegado 2026-06-16).
 
 **Naturaleza de la entrega**: **web-preview nutrida** con datos e imágenes de ejemplo (estrategia SVG + pack de prompts IA). Sin precios. Sin Spotify. Mail diferido.
 
@@ -20,18 +20,23 @@
 
 | Fase | Módulo | Estado |
 |---|---|---|
-| S0 | Bootstrap sistema de memoria + scaffold Next.js rebrandeado | ⏳ En curso |
-| S1 | Identidad TECO + Tweaks Pro ampliado + primitivas de diseño | ⏭ Pendiente |
-| S2 | Secciones (Home · Artistas · Sesiones · Eventos · Contacto) | ⏭ Pendiente |
-| S3 | Datos de ejemplo + imágenes (SVG + prompts) | ⏭ Pendiente |
-| S4 | Pulido, responsive, validación visual, build | ⏭ Pendiente |
-| S5 | Despliegue VPS + DNS Cloudflare `brecords` | ⏭ Pendiente (gated: token CF) |
+| S0 | Bootstrap sistema de memoria + scaffold Next.js rebrandeado | ✅ Cerrada |
+| S1 | Identidad TECO + Tweaks Pro ampliado + primitivas de diseño | ✅ Cerrada |
+| S2 | Secciones (Home · Artistas · Sesiones · Eventos · Contacto) | ✅ Cerrada |
+| S3 | Datos de ejemplo + imágenes (SVG + prompts) | ✅ Cerrada |
+| S4 | Pulido, responsive, validación visual, build | ✅ Cerrada |
+| S5 | Despliegue VPS + DNS Cloudflare `brecords` | ✅ Cerrada (en vivo 2026-06-16) |
 
 ### Lo que se está cocinando / próximos hitos
 
-- Cerrar S0 (memoria + base técnica) y S1 (design system TECO + Tweaks).
-- Orquestar S2 con varios subagentes en paralelo (una sección por agente) sobre el contrato de clases CSS.
-- Poblar contenido de ejemplo creíble (artistas, sesiones, eventos) y generar pósters SVG.
+- **Web en vivo y lista para enseñar a los fundadores** (S0–S5 cerradas el 2026-06-16):
+  `https://brecords.unlimited-systems.net`, 5 rutas, datos de ejemplo, póster SVG y Tweaks Pro.
+- Tras feedback de los fundadores: sustituir placeholders por datos reales
+  (handles, dirección, fotos vía `IMAGENES.md`) y, si se decide, activar email real
+  (añadir vars al `.env.production.local` del VPS + `systemctl restart backstage-web`).
+- **Acción de seguridad pendiente del operador**: revocar/rotar el token de
+  Cloudflare que se compartió en chat para este despliegue.
+- Redeploy de cambios de código: ver receta en [`docs/04-despliegue.md`](docs/04-despliegue.md).
 
 ### Datos / decisiones pendientes del operador
 
@@ -77,6 +82,8 @@
 | Fecha | Hito | Detalle |
 |---|---|---|
 | 2026-06-04 | Bootstrap | Alta del repo en el sistema de memoria + scaffold Next.js + identidad TECO. [Ver](docs/changelog/2026-06-04_bootstrap.md) |
+| 2026-06-16 | Web completa S1–S4 | Sitio entero (5 rutas) con orquestación multi-agente, home a mano, validado en tipos/build/visual + Tweaks. [Ver](docs/changelog/2026-06-16_web-completa.md) |
+| 2026-06-16 | Despliegue S5 | En vivo en `brecords.unlimited-systems.net` (DNS CF + `backstage-web.service` :3001 + vhost Apache + Let's Encrypt). [Ver](docs/changelog/2026-06-16_web-completa.md) |
 
 ---
 
@@ -107,8 +114,8 @@ Organización descrita en `C:\GitHub\UNLIMITED_AI_BRAIN\SISTEMA.md`:
 
 **URLs**:
 - Dev local: http://localhost:3000
-- Producción / staging: https://brecords.unlimited-systems.net (no desplegado)
-- IP servidor: `185.213.25.188` · puerto interno previsto `127.0.0.1:3001`
+- Producción: **https://brecords.unlimited-systems.net** (en vivo desde 2026-06-16)
+- IP servidor: `185.213.25.188` · puerto interno `127.0.0.1:3001` (`backstage-web.service`)
 
 **Git**: branch principal `main`. Operador: `yagogurru77@gmail.com`.
 
